@@ -1,4 +1,3 @@
-# E2B-sandbox
 # Agentic Execution: Building a Self-Healing AI with E2B & Gemini
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
