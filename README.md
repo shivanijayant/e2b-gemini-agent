@@ -26,14 +26,20 @@ Before letting an AI run wild, I needed to test the boundaries of the execution 
 If an AI agent cannot see its own errors, it cannot improve. I built a loop to catch `stderr` crash logs from the E2B sandbox and feed them back into Gemini so it could debug its own code. 
 * **Test 5 (`test_5_errors.py`):** Intentionally crashed the sandbox with a `ZeroDivisionError` to ensure the Python SDK could successfully capture and extract standard error logs locally.
 * **Test 6 (`test_6_self_healing.py`):** The Fake Library Trap. I forced the agent to import a hallucinated library (`quantum_flux_matrix`). Attempt 1 crashed. The loop fed the exact error back to Gemini, which realized its mistake and dynamically wrote a mock class to satisfy the prompt on Attempt 2.
-  > *(Hey, insert your screenshot here showing Attempt 1 failing with `ModuleNotFoundError` and Attempt 2 succeeding!)*
+<img width="1387" height="1104" alt="image" src="https://github.com/user-attachments/assets/27c88362-e572-462a-a8c5-1df11fe12dcd" />
+
 * **Test 7 (`test_7_data_extraction.py`):** The Rate Limit Wall. During heavy testing, I hit Google's `429 Resource Exhausted` limit. I handled this by architecting a model fallback strategy—switching from Gemini 2.0 Flash to Flash-Lite—proving the necessity of multi-model failovers in production.
 
 ### Phase 3: Security & Complex Pipelines
 * **Test 8 (`test_8_security.py`):** The Hostile Agent. I deliberately injected a CPU Fork Bomb and attempted to access the host's `/etc/shadow` file. The Firecracker microVM contained the attack perfectly: the filesystem returned `Permission Denied`, and the Fork Bomb was terminated cleanly by a local SDK timeout, leaving my machine completely unaffected.
-  > *(Insert your screenshot here showing the "ACCESS DENIED" and the `TimeoutException` neutralizing the attack!)*
+<img width="1730" height="718" alt="image" src="https://github.com/user-attachments/assets/441f06a0-26af-40c2-9390-6fccf2a563a0" />
+<img width="1724" height="420" alt="image" src="https://github.com/user-attachments/assets/14b7e167-d67e-4fb5-b5a0-3306fa9ea592" />
+
+With a modified reaction, the timeout cleanly severed the connection, killed the microVM, and safely returned control to the terminal, proving that a hostile infinite loop won't bring down the main server.
+<img width="1282" height="974" alt="image" src="https://github.com/user-attachments/assets/283bd453-ffa3-4554-acf4-ee4e28d12e3b" />
+
 * **Test 9 (`test_9_data_science.py`):** The Data Science Benchmark. Tasked the agent to act as an autonomous data scientist. It downloaded heavy ML dependencies (`scikit-learn`, `pandas`), synthesized a dataset, ran a linear regression analysis, and safely extracted the resulting metrics artifact (R² = 0.94) back to my host machine.
-  > *(Insert your screenshot of the final R-squared model metrics output here!)*
+<img width="1210" height="369" alt="image" src="https://github.com/user-attachments/assets/c0c8c3bb-0aae-43cb-a4a6-faf1e6f86ed9" />
 
 ---
 
